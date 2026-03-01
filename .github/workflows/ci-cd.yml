@@ -25,7 +25,7 @@ jobs:
       - name: Build and push Backend image
         uses: docker/build-push-action@v4
         with:
-          context: ./backend-app
+          context: ./springboot
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/springboot-app:latest
 
@@ -33,6 +33,6 @@ jobs:
       - name: Build and push Frontend image
         uses: docker/build-push-action@v4
         with:
-          context: ./frontend-app
+          context: ./angular-app
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/angular-app:latest
