@@ -39,7 +39,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/angular-app:latest
 
-      # Step 5: Start containers using docker compose (sans tiret)
+      # Step 5: Start containers using modern docker compose
       - name: Start containers
         run: |
           docker compose up -d
@@ -51,7 +51,6 @@ jobs:
           docker ps
 
           echo "Vérification: Frontend communique avec Backend..."
-
           MAX_RETRIES=12   # 12 x 5s = 60 secondes max
           RETRY_COUNT=0
           until [ $RETRY_COUNT -ge $MAX_RETRIES ]
