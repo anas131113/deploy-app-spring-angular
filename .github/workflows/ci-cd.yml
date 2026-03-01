@@ -40,28 +40,27 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/angular-app:latest
 
       # Step 5: Start containers using modern docker compose
-      # Change: Removed hyphen (docker-compose → docker compose)
       - name: Start containers
         run: |
           docker compose up -d
 
       # Step 6: Vérifications automatiques avec retry
-      # Change: Added loop to fix Exit Code 7 / timeout
-      # Change: Corrected indentation and closed if statement properly (fi)
+      # FIXED: Changed localhost:80 to localhost:4200 to match exposed port
       - name: Vérifications des conteneurs et frontend
         run: |
           echo "Vérification: tous les conteneurs sont en running..."
           docker ps
 
           echo "Vérification: Frontend communique avec Backend..."
-          MAX_RETRIES=12   # 12 x 5s = 60 secondes max
+          MAX_RETRIES=12
           RETRY_COUNT=0
+          RESPONSE="000"
 
           until [ $RETRY_COUNT -ge $MAX_RETRIES ]
           do
-              RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80 || echo "000")
+              RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 || echo "000")
               
-              if [ "$RESPONSE" -eq 200 ]; then
+              if [ "$RESPONSE" = "200" ]; then
                   echo "Frontend OK, communication avec Backend OK 👍"
                   break
               fi
@@ -72,7 +71,8 @@ jobs:
           done
 
           # Final check after loop
-          if [ "$RESPONSE" -ne 200 ]; then
+          if [ "$RESPONSE" != "200" ]; then
               echo "Erreur: le frontend ne répond pas après 60 secondes !"
+              docker logs deploy-app-spring-angular-angular-app-1 || true
               exit 1
           fi
