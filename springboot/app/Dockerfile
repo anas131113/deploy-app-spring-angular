@@ -1,6 +1,23 @@
+# Stage 1 — Build the application
+FROM maven:3.9.9-eclipse-temurin-11 AS builder
+
+WORKDIR /build
+
+# copy everything
+COPY . .
+
+# compile and create jar
+RUN mvn clean package -DskipTests
+
+
+# Stage 2 — Run the application
 FROM eclipse-temurin:11
-VOLUME /tmp
+
+WORKDIR /app
+
+# copy jar from builder stage
+COPY --from=builder /build/target/*.jar app.jar
+
 EXPOSE 8081
-ARG JAR_FILE=target/demo-0.0.1.jar
-ADD ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+
+ENTRYPOINT ["java","-jar","app.jar"]
