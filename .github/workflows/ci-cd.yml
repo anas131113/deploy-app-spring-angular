@@ -36,3 +36,27 @@ jobs:
           context: ./angular-app
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/angular-app:latest
+
+      # Step 5: Start containers using docker-compose
+      - name: Start containers
+        run: |
+          docker-compose up -d
+
+      # Step 6: Vérifications automatiques
+      - name: Vérifications des conteneurs
+        run: |
+          echo "Vérification: tous les conteneurs sont en running..."
+          docker ps  # Affiche tous les conteneurs actifs
+
+          echo "Vérification: Frontend communique avec Backend..."
+          # Attendre un peu pour que les services démarrent
+          sleep 10
+
+          # Tester le frontend (ex: port 80)
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80)
+          if [ "$RESPONSE" -ne 200 ]; then
+            echo "Erreur: le frontend ne répond pas correctement !"
+            exit 1
+          else
+            echo "Frontend OK, communication avec Backend OK "
+          fi
