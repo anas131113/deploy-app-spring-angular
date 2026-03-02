@@ -45,7 +45,7 @@ jobs:
           docker compose up -d
 
       # Step 6: Vérifications automatiques avec retry
-      # FIXED: Changed localhost:80 to localhost:4200 to match exposed port
+
       - name: Vérifications des conteneurs et frontend
         run: |
           echo "Vérification: tous les conteneurs sont en running..."
